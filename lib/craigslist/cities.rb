@@ -22,6 +22,8 @@ module Craigslist
     'san_diego' => 'sandiego',
     'seattle' => 'seattle',
     'sf_bayarea' => 'sfbay',
-    'wash_dc' => 'washingtondc'
+    'wash_dc' => 'washingtondc',
+    'istanbul' => 'istanbul',
+    'london' => 'london'
   }
 end
