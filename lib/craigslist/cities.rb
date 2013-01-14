@@ -23,7 +23,6 @@ module Craigslist
     'seattle' => 'seattle',
     'sf_bayarea' => 'sfbay',
     'wash_dc' => 'washingtondc',
-    'istanbul' => 'istanbul',
-    'ankara' => 'ankara'
+    'istanbul' => 'istanbul'
   }
 end
