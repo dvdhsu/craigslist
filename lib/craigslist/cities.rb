@@ -1,6 +1,5 @@
 module Craigslist
   CITIES = {
-    US = {
         'atlanta' => 'atlanta',
         'austin' => 'austin',
         'boston' => 'boston',
@@ -23,9 +22,7 @@ module Craigslist
         'san_diego' => 'sandiego',
         'seattle' => 'seattle',
         'sf_bayarea' => 'sfbay',
-        'wash_dc' => 'washingtondc'
-    },
-    UK = {    
+        'wash_dc' => 'washingtondc',
         'aberdeen' => 'aberdeen',
         'bath' => 'bath',
         'belfast' => 'belfast',
@@ -52,11 +49,8 @@ module Craigslist
         'newcastle' => 'newcastle',
         'nottingham' => 'nottingham',
         'oxford' => 'oxford', 
-        'sheffield' => 'sheffield'
-    }
-    EU = {
+        'sheffield' => 'sheffield',
         'istanbul' => 'istanbul',
         'amsterdam' => 'amsterdam'
-    }
   }
 end
