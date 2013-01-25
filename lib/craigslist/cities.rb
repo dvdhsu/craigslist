@@ -1,5 +1,6 @@
 module Craigslist
   CITIES = {
+        'albany' => 'albany',
         'atlanta' => 'atlanta',
         'austin' => 'austin',
         'boston' => 'boston',

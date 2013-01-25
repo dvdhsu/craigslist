@@ -78,38 +78,38 @@ module Craigslist
       doc = Nokogiri::HTML(open(uri))
 
       count = 0
-      arr = []
+      search_results = []
       doc.xpath("//p[@class = 'row']").each do |node|
-        h = {}
+        search_result = {}
 
         inner = Nokogiri::HTML(node.to_s)
         i = 0
         inner.xpath("//a").each do |inner_node|
           if i % 2 == 0
-            h['text'] = inner_node.text.strip
-            h['href'] = inner_node['href']
+            search_result['text'] = inner_node.text.strip
+            search_result['href'] = inner_node['href']
           end
           i += 1
         end
 
         inner.xpath("//span[@class = 'itempp']").each do |inner_node|
-          h['price'] = inner_node.text.strip
+          search_result['price'] = inner_node.text.strip
         end
 
         inner.xpath("//span[@class = 'itempn']/font").each do |inner_node|
-          h['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
+          search_result['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
         end
 
         inner.xpath("//span[@class = 'itempx']/span[@class = 'p']").each do |inner_node|
-          h['has_img'] = inner_node.text.include?('img') ? true : false 
-          h['has_pic'] = inner_node.text.include?('pic') ? true : false
+          search_result['has_img'] = inner_node.text.include?('img') ? true : false 
+          search_result['has_pic'] = inner_node.text.include?('pic') ? true : false
         end
 
         count += 1
-        arr << h
+        search_results << search_result
         break if count == max_results
       end
-      arr
+      search_results
     end
 
     alias_method :posts, :last
