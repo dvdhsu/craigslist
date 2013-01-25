@@ -14,13 +14,13 @@ module Craigslist
     end
 
     def categories
-      arr = CATEGORIES.keys
+      categories = CATEGORIES.keys
       CATEGORIES.each do |key, value|
         if value['children']
-          arr.concat(value['children'].keys)
+          categories.concat(value['children'].keys)
         end
       end
-      arr.sort
+      categories.sort
     end
 
     def city?(city)
@@ -31,8 +31,8 @@ module Craigslist
       return true if CATEGORIES.keys.include?(category)
 
       CATEGORIES.each do |key, value|
-        if value['children']
-          return true if value['children'].keys.include?(category)
+        if value['children'] && value['children'].keys.include?(category)
+          return true
         end
       end
 
@@ -67,7 +67,11 @@ module Craigslist
     end
 
     def build_uri(city_path, category_path)
-      uri = "http://#{city_path}.craigslist.org/#{category_path}/"
+      "http://#{city_path}.craigslist.org/#{category_path}/"
+    end
+
+    def more_results(uri, result_count=0)
+      uri + "index#{result_count.to_i * 100}.html"
     end
 
     def last(max_results=20)
@@ -75,40 +79,43 @@ module Craigslist
         Craigslist::PERSISTENT.city && Craigslist::PERSISTENT.category
 
       uri = self.build_uri(Craigslist::PERSISTENT.city, Craigslist::PERSISTENT.category)
-      doc = Nokogiri::HTML(open(uri))
-
-      count = 0
       search_results = []
-      doc.xpath("//p[@class = 'row']").each do |node|
-        search_result = {}
 
-        inner = Nokogiri::HTML(node.to_s)
-        i = 0
-        inner.xpath("//a").each do |inner_node|
-          if i % 2 == 0
-            search_result['text'] = inner_node.text.strip
-            search_result['href'] = inner_node['href']
+      for i in 0..(max_results / 100)
+        uri = self.more_results(uri, i) if i > 0
+        doc = Nokogiri::HTML(open(uri))
+
+        doc.xpath("//p[@class = 'row']").each do |node|
+          search_result = {}
+
+          inner = Nokogiri::HTML(node.to_s)
+          j = 0
+          inner.xpath("//a").each do |inner_node|
+            if j % 2 == 0
+              search_result['text'] = inner_node.text.strip
+              search_result['href'] = inner_node['href']
+            end
+            j += 1
           end
-          i += 1
-        end
 
-        inner.xpath("//span[@class = 'itempp']").each do |inner_node|
-          search_result['price'] = inner_node.text.strip
-        end
+          inner.xpath("//span[@class = 'itempp']").each do |inner_node|
+            search_result['price'] = inner_node.text.strip
+          end
 
-        inner.xpath("//span[@class = 'itempn']/font").each do |inner_node|
-          search_result['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
-        end
+          inner.xpath("//span[@class = 'itempn']/font").each do |inner_node|
+            search_result['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
+          end
 
-        inner.xpath("//span[@class = 'itempx']/span[@class = 'p']").each do |inner_node|
-          search_result['has_img'] = inner_node.text.include?('img') ? true : false 
-          search_result['has_pic'] = inner_node.text.include?('pic') ? true : false
-        end
+          inner.xpath("//span[@class = 'itempx']/span[@class = 'p']").each do |inner_node|
+            search_result['has_img'] = inner_node.text.include?('img') ? true : false 
+            search_result['has_pic'] = inner_node.text.include?('pic') ? true : false
+          end
 
-        count += 1
-        search_results << search_result
-        break if count == max_results
+          search_results << search_result
+          break if search_results.length == max_results
+        end
       end
+
       search_results
     end
 
