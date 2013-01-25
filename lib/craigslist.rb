@@ -22,7 +22,7 @@ module Craigslist
     end
 
     def city?(city)
-      CITIES.keys.include?(city) ? true : false
+      CITIES.keys.include?(city)
     end
 
     def category?(category)
