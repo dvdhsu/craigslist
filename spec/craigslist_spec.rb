@@ -115,6 +115,15 @@ describe "Craigslist" do
       posts.should be_a Array
       posts.length.should eq max_results
     end
+
+    it "should have content in each result" do
+      max_results = 20
+      posts = Craigslist.new_york.for_sale.bikes.last(max_results)
+      posts.each do |post|
+        post['text'].should_not be nil
+        post['href'].should_not be nil
+      end
+    end
   end
 
   context "#posts" do
