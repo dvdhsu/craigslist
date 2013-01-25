@@ -89,13 +89,11 @@ module Craigslist
           search_result = {}
 
           inner = Nokogiri::HTML(node.to_s)
-          j = 0
-          inner.xpath("//a").each do |inner_node|
-            if j % 2 == 0
+          inner.xpath("//a").each_with_index do |inner_node, index|
+            if index.even?
               search_result['text'] = inner_node.text.strip
               search_result['href'] = inner_node['href']
             end
-            j += 1
           end
 
           inner.xpath("//span[@class = 'itempp']").each do |inner_node|

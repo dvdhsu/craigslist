@@ -33,11 +33,10 @@ Craigslist.seattle.for_sale.bikes.last
 
 # Also note that category can come before city in the method chain with no
 # change in results.
-Craigslist.for_sale.seattle.last
+Craigslist.bikes.for_sale.seattle.last
 
-# The max_results can be specified in an argument to #last.
-# Currently, the gem is only fetching the first page of results which limits
-# results to a max of 100.
+# The max_results can be specified in an argument to #last. The gem (theoretically)
+# supports an infinite amount of results. Just don't go crazy.
 Craigslist.seattle.for_sale.last(40)
 
 # You can also access last via a dynamic finder method in this format.

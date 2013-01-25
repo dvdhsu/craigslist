@@ -65,10 +65,18 @@ describe "Craigslist" do
     end
   end
 
-  context "a category method" do
+  context "a for_sale method" do
     it "should return a Craigslist:Module object so that method calls can be
       chained" do
       Craigslist.for_sale.should be_a Module
+    end
+  end
+
+  context "a category method" do
+    it "should be chainable" do
+      posts = Craigslist.seattle.for_sale.bikes.last
+      posts.should be_a Array
+      posts.length.should eq 20
     end
   end
 
@@ -103,7 +111,7 @@ describe "Craigslist" do
 
     it "should be able to handle a request for over 100 results" do
       max_results = 150
-      posts = Craigslist.new_york.for_sale.last(max_results)
+      posts = Craigslist.new_york.for_sale.bikes.last(max_results)
       posts.should be_a Array
       posts.length.should eq max_results
     end
