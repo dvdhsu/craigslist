@@ -16,9 +16,7 @@ module Craigslist
     def categories
       categories = CATEGORIES.keys
       CATEGORIES.each do |key, value|
-        if value['children']
-          categories.concat(value['children'].keys)
-        end
+        categories.concat(value['children'].keys) if value['children']
       end
       categories.sort
     end
@@ -36,7 +34,7 @@ module Craigslist
         end
       end
 
-      false
+      return false
     end
 
     # Create city methods
