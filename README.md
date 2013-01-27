@@ -19,37 +19,37 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-$ require 'craigslist'
+require 'craigslist'
 
 # Return an array of posts for a city and category.
-$ Craigslist.seattle.for_sale.last
+Craigslist.seattle.for_sale.last
 
 # Note that any additional category in the method chain will override any
 # previous category. The same is true for cities.
 # In this example 'bikes' is the category that is used, not 'for sale'.
-$ Craigslist.seattle.for_sale.bikes.last
+Craigslist.seattle.for_sale.bikes.last
 
 # Also note that category can come before city in the method chain with no
 # change in results.
-$ Craigslist.for_sale.seattle.last
+Craigslist.for_sale.seattle.last
 
 # The max_results can be specified in an argument to #last. Max results can
 # span multiple pages
-$ Craigslist.seattle.for_sale.last(40)
+Craigslist.seattle.for_sale.last(40)
 
 # Return an array of supported cities.p
-$ Craigslist.cities
+Craigslist.cities
 
 # Return an array of supported categories.
-$ Craigslist.categories
+Craigslist.categories
 
 # Return true if the city is supported.
-$ Craigslist.city?('seattle')
-> true
+Craigslist.city?('seattle')
+=> true
 
 # Return true if the category is supported.
-$ Craigslist.category?('for_sale')
-> true
+Craigslist.category?('for_sale')
+=> true
 ```
 
 ## Contributing
