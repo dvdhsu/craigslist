@@ -13,7 +13,7 @@ describe "Craigslist" do
     it "should return an Array of categories" do
       categories = Craigslist.categories
       categories.should be_a Array
-      categories.length.should be > 5
+      categories.length.should be > 10
     end
   end
 
@@ -59,33 +59,20 @@ describe "Craigslist" do
   end
 
   context "a city method" do
-    it "should return a Craigslist:Module object so that method calls can be
-      chained" do
-      Craigslist.seattle.should be_a Module
-    end
-  end
-
-  context "a for_sale method" do
-    it "should return a Craigslist:Module object so that method calls can be
-      chained" do
-      Craigslist.for_sale.should be_a Module
+    it "should return its receiver so that method calls can be chained" do
+      craigslist = Craigslist
+      craigslist.seattle.should be craigslist
     end
   end
 
   context "a category method" do
-    it "should be chainable" do
-      posts = Craigslist.seattle.for_sale.bikes.last
-      posts.should be_a Array
-      posts.length.should eq 20
+    it "should return its receiver so that method calls can be chained" do
+      craigslist = Craigslist
+      craigslist.for_sale.should be craigslist
     end
   end
 
   context "#last" do
-    it "should be able to be called without 'for_sale'" do
-      posts = Craigslist.seattle.last
-      posts.should be_a Array
-    end
-
     it "should return the default number of last posts for seattle and
       for_sale" do
       posts = Craigslist.seattle.for_sale.last
@@ -97,14 +84,6 @@ describe "Craigslist" do
       for_sale" do
       max_results = 2
       posts = Craigslist.seattle.for_sale.last(max_results)
-      posts.should be_a Array
-      posts.length.should eq max_results
-    end
-
-    it "should return a specific number of last posts for seattle and for_sale
-      using a dynamic finder method" do
-      max_results = 2
-      posts = Craigslist.seattle.for_sale.send(("last_" + max_results.to_s).to_sym)
       posts.should be_a Array
       posts.length.should eq max_results
     end
@@ -123,15 +102,6 @@ describe "Craigslist" do
         post['text'].should_not be nil
         post['href'].should_not be nil
       end
-    end
-  end
-
-  context "#posts" do
-    it "should return the default number of last posts for seattle and
-      for_sale since #posts is an alias of #last" do
-      posts = Craigslist.seattle.for_sale.posts
-      posts.should be_a Array
-      posts.length.should eq 20
     end
   end
 end

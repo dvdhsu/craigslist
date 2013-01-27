@@ -114,15 +114,5 @@ module Craigslist
 
       search_results
     end
-
-    alias_method :posts, :last
-
-    def method_missing(name, *args, &block)
-      if name =~ /^last_(\d*)$/
-        self.send(:last, /^last_(\d*)$/.match(name)[1].to_i)
-      else
-        super
-      end
-    end
   end
 end

@@ -19,52 +19,44 @@ Or install it yourself as:
 ## Usage
 
 ```ruby
-require 'craigslist'
+$ require 'craigslist'
 
 # Return an array of posts for a city and category.
-Craigslist.seattle.for_sale.last
+$ Craigslist.seattle.for_sale.last
 
-# Note that any additional city/category in the method chain will override any
-# previous city/category.
+# Note that any additional category in the method chain will override any
+# previous category. The same is true for cities.
 # In this example 'bikes' is the category that is used, not 'for sale'.
-# Having #for_sale before #bikes in the method chain may give some added
-# readability in the expression without adding any performance cost.
-Craigslist.seattle.for_sale.bikes.last
+$ Craigslist.seattle.for_sale.bikes.last
 
 # Also note that category can come before city in the method chain with no
 # change in results.
-Craigslist.bikes.for_sale.seattle.last
+$ Craigslist.for_sale.seattle.last
 
-# The max_results can be specified in an argument to #last. The gem (theoretically)
-# supports an infinite amount of results. Just don't go crazy.
-Craigslist.seattle.for_sale.last(40)
+# The max_results can be specified in an argument to #last. Max results can
+# span multiple pages
+$ Craigslist.seattle.for_sale.last(40)
 
-# You can also access last via a dynamic finder method in this format.
-Craigslist.seattle.for_sale.last_40
-
-# #posts is an alias of #last.
-Craigslist.for_sale.seattle.posts
-
-# Return an array of supported cities.
-Craigslist.cities
+# Return an array of supported cities.p
+$ Craigslist.cities
 
 # Return an array of supported categories.
-Craigslist.categories
+$ Craigslist.categories
 
 # Return true if the city is supported.
-Craigslist.city?('seattle')
-=> true
+$ Craigslist.city?('seattle')
+> true
 
 # Return true if the category is supported.
-Craigslist.category?('for_sale')
-=> true
+$ Craigslist.category?('for_sale')
+> true
 ```
 
 ## Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
@@ -74,9 +66,7 @@ This software is not associated with Craigslist and is intended for research pur
 
 ## License
 
-(The MIT License)
-
-Copyright (c) 2012 Greg Stallings
+Copyright (c) 2013 Greg Stallings
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
