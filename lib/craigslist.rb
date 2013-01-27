@@ -14,29 +14,27 @@ module Craigslist
     end
 
     def categories
-      arr = CATEGORIES.keys
+      categories = CATEGORIES.keys
       CATEGORIES.each do |key, value|
-        if value['children']
-          arr.concat(value['children'].keys)
-        end
+        categories.concat(value['children'].keys) if value['children']
       end
-      arr.sort
+      categories.sort
     end
 
     def city?(city)
-      CITIES.keys.include?(city) ? true : false
+      CITIES.keys.include?(city)
     end
 
     def category?(category)
       return true if CATEGORIES.keys.include?(category)
 
       CATEGORIES.each do |key, value|
-        if value['children']
-          return true if value['children'].keys.include?(category)
+        if value['children'] && value['children'].keys.include?(category)
+          return true
         end
       end
 
-      false
+      return false
     end
 
     # Create city methods
@@ -67,7 +65,11 @@ module Craigslist
     end
 
     def build_uri(city_path, category_path)
-      uri = "http://#{city_path}.craigslist.org/#{category_path}/"
+      "http://#{city_path}.craigslist.org/#{category_path}/"
+    end
+
+    def more_results(uri, result_count=0)
+      uri + "index#{result_count.to_i * 100}.html"
     end
 
     def last(max_results=20)
@@ -75,41 +77,42 @@ module Craigslist
         Craigslist::PERSISTENT.city && Craigslist::PERSISTENT.category
 
       uri = self.build_uri(Craigslist::PERSISTENT.city, Craigslist::PERSISTENT.category)
-      doc = Nokogiri::HTML(open(uri))
+      search_results = []
 
-      count = 0
-      arr = []
-      doc.xpath("//p[@class = 'row']").each do |node|
-        h = {}
+      for i in 0..(max_results / 100)
+        uri = self.more_results(uri, i) if i > 0
+        doc = Nokogiri::HTML(open(uri))
 
-        inner = Nokogiri::HTML(node.to_s)
-        i = 0
-        inner.xpath("//a").each do |inner_node|
-          if i % 2 == 0
-            h['text'] = inner_node.text.strip
-            h['href'] = inner_node['href']
+        doc.xpath("//p[@class = 'row']").each do |node|
+          search_result = {}
+
+          inner = Nokogiri::HTML(node.to_s)
+          inner.xpath("//a").each_with_index do |inner_node, index|
+            if index.even?
+              search_result['text'] = inner_node.text.strip
+              search_result['href'] = inner_node['href']
+            end
           end
-          i += 1
-        end
 
-        inner.xpath("//span[@class = 'itempp']").each do |inner_node|
-          h['price'] = inner_node.text.strip
-        end
+          inner.xpath("//span[@class = 'itempp']").each do |inner_node|
+            search_result['price'] = inner_node.text.strip
+          end
 
-        inner.xpath("//span[@class = 'itempn']/font").each do |inner_node|
-          h['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
-        end
+          inner.xpath("//span[@class = 'itempn']/font").each do |inner_node|
+            search_result['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
+          end
 
-        inner.xpath("//span[@class = 'itempx']/span[@class = 'p']").each do |inner_node|
-          h['has_img'] = inner_node.text.include?('img') ? true : false 
-          h['has_pic'] = inner_node.text.include?('pic') ? true : false
-        end
+          inner.xpath("//span[@class = 'itempx']/span[@class = 'p']").each do |inner_node|
+            search_result['has_img'] = inner_node.text.include?('img') ? true : false 
+            search_result['has_pic'] = inner_node.text.include?('pic') ? true : false
+          end
 
-        count += 1
-        arr << h
-        break if count == max_results
+          search_results << search_result
+          break if search_results.length == max_results
+        end
       end
-      arr
+
+      search_results
     end
 
     alias_method :posts, :last
