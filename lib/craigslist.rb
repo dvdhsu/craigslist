@@ -83,29 +83,29 @@ module Craigslist
         uri = self.more_results(uri, i) if i > 0
         doc = Nokogiri::HTML(open(uri))
 
-        doc.xpath("//p[@class = 'row']").each do |node|
+        doc.css("p.row").each do |node|
           search_result = {}
 
-          inner = Nokogiri::HTML(node.to_s)
-          inner.xpath("//a").each_with_index do |inner_node, index|
-            if index.even?
-              search_result['text'] = inner_node.text.strip
-              search_result['href'] = inner_node['href']
-            end
+          title = node.at_css(".title1 a")
+          search_result['text'] = title.text.strip
+          search_result['href'] = title['href']
+
+          if price = node.at_css(".itempp")
+            search_result['price'] = price.text.strip
+          else
+            search_result['price'] = nil
           end
 
-          inner.xpath("//span[@class = 'itempp']").each do |inner_node|
-            search_result['price'] = inner_node.text.strip
+          if location = node.at_css(".itempnr small")
+            search_result['location'] = location.text.strip[1..-2].strip # remove brackets
+          else
+            search_result['location'] = nil
           end
 
-          inner.xpath("//span[@class = 'itempn']/font").each do |inner_node|
-            search_result['location'] = inner_node.text.strip[1..(inner_node.text.strip.length - 2)].strip
-          end
+          attributes = node.at_css(".itempx").text
 
-          inner.xpath("//span[@class = 'itempx']/span[@class = 'p']").each do |inner_node|
-            search_result['has_img'] = inner_node.text.include?('img') ? true : false 
-            search_result['has_pic'] = inner_node.text.include?('pic') ? true : false
-          end
+          search_result['has_img'] = attributes.include?('img') ? true : false
+          search_result['has_pic'] = attributes.include?('pic') ? true : false
 
           search_results << search_result
           break if search_results.length == max_results
