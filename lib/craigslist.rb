@@ -4,6 +4,7 @@ require 'nokogiri'
 require_relative 'craigslist/cities'
 require_relative 'craigslist/categories'
 require_relative 'craigslist/craigslist'
+require_relative 'helpers'
 
 module Craigslist
   PERSISTENT = Persistent.new
