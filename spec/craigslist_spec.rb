@@ -1,6 +1,10 @@
 require 'craigslist'
 
 describe "Craigslist" do
+  before(:each) do
+    Craigslist.clear
+  end
+
   context "#cites" do
     it "should return an Array of cities" do
       cities = Craigslist.cities
@@ -43,6 +47,16 @@ describe "Craigslist" do
     it "should return a valid uri" do
       Craigslist.build_uri('seattle', 'jjj').should eq "http://seattle.craigslist.org/jjj/"
     end
+
+    it "should return a valid search uri" do
+      search = {
+        query: "new guitar",
+        type: :only_title,
+      }
+
+      uri = Craigslist.build_uri('seattle', 'sss', search)
+      uri.should eq "http://seattle.craigslist.org/search/sss?query=new+guitar&srchType=T"
+    end
   end
 
   context "#more_results" do
@@ -69,6 +83,15 @@ describe "Craigslist" do
     it "should return its receiver so that method calls can be chained" do
       craigslist = Craigslist
       craigslist.for_sale.should be craigslist
+    end
+  end
+
+  context "#search" do
+    it "should return results with query matching each post title" do
+      posts = Craigslist.seattle.for_sale.search(query: "guitar", type: :only_title).last
+      posts.should be_a Array
+      posts.length.should eq 20
+      posts.each { |post| post["text"].should =~ /guitar/i }
     end
   end
 
