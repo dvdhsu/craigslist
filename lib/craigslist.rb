@@ -121,23 +121,25 @@ module Craigslist
         doc.css("p.row").each do |node|
           search_result = {}
 
-          title = node.at_css(".title1 a")
+          title = node.at_css(".pl a")
           search_result['text'] = title.text.strip
           search_result['href'] = title['href']
 
-          if price = node.at_css(".itempp")
+          info = node.at_css(".l2 .pnr")
+
+          if price = info.at_css(".price")
             search_result['price'] = price.text.strip
           else
             search_result['price'] = nil
           end
 
-          if location = node.at_css(".itempnr small")
+          if location = info.at_css("small")
             search_result['location'] = location.text.strip[1..-2].strip # remove brackets
           else
             search_result['location'] = nil
           end
 
-          attributes = node.at_css(".itempx").text
+          attributes = info.at_css(".px").text
 
           search_result['has_img'] = attributes.include?('img') ? true : false
           search_result['has_pic'] = attributes.include?('pic') ? true : false
