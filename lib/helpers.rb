@@ -1,5 +1,4 @@
 require 'cgi'
-require 'rack/utils'
 
 module Helpers
   # Borrowed from the Rack gem
