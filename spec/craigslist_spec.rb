@@ -1,129 +1,159 @@
 require 'craigslist'
 
-describe "Craigslist" do
-  before(:each) do
-    Craigslist.clear
-  end
+describe 'Craigslist' do
+  describe 'Module' do
+    context '#categories' do
+      it 'should return an Array of categories' do
+        categories = Craigslist.categories
+        categories.should be_a Array
+        categories.length.should be > 100
+      end
+    end
 
-  context "#cites" do
-    it "should return an Array of cities" do
-      cities = Craigslist.cities
-      cities.should be_a Array
-      cities.length.should be > 10
+    context '#valid_city?' do
+      let(:existing_cities) { %w[seattle sfbay] }
+      let(:nonexisting_cities) { %w[asdfasdf qwerty] }
+
+      it 'should return true for cities that exist' do
+        existing_cities.each do |city|
+          Craigslist.valid_city?(city).should be true
+        end
+      end
+
+      it 'should return false for cities that do not exist' do
+        nonexisting_cities.each do |city|
+          Craigslist.valid_city?(city).should be false
+        end
+      end
+    end
+
+    context '#valid_category_name?' do
+      let(:existing_categories) { %w[for_sale bikes] }
+      let(:nonexisting_categories) { %w[asdfasdf qwerty] }
+
+      it 'should return true for categories that exist' do
+        existing_categories.each do |cat|
+          Craigslist.valid_category_name?(cat).should be true
+        end
+      end
+
+      it 'should return false for categories that do not exist' do
+        nonexisting_categories.each do |cat|
+          Craigslist.valid_category_name?(cat).should be false
+        end
+      end
+    end
+
+    context '#valid_category_path?' do
+      let(:existing_categories) { %w[sss bia] }
+      let(:nonexisting_categories) { %w[asdfasdf qwerty] }
+
+      it 'should return true for categories that exist' do
+        existing_categories.each do |cat|
+          Craigslist.valid_category_path?(cat).should be true
+        end
+      end
+
+      it 'should return false for categories that do not exist' do
+        nonexisting_categories.each do |cat|
+          Craigslist.valid_category_path?(cat).should be false
+        end
+      end
+    end
+
+    context '#category_path_by_name' do
+      let(:category_pairs) { { for_sale: 'sss', bikes: 'bia' } }
+
+      it 'should return the correct path for each name' do
+        category_pairs.each do |key, value|
+          Craigslist.category_path_by_name(key).should == value
+        end
+      end
+    end
+
+    describe 'an initial call to city' do
+      context 'using writer methods' do
+        it 'should return a new instance with the expected value set' do
+          c = Craigslist.city(:seattle)
+          c.should be_instance_of Craigslist::Persistable
+          c.city.should == :seattle
+        end
+      end
+
+      context 'using dynamic finder methods' do
+        it 'should return a new instance with the expected value set' do
+          c = Craigslist.seattle
+          c.should be_instance_of Craigslist::Persistable
+          c.city.should == :seattle
+        end
+      end
+    end
+
+    describe 'an initial call to category' do
+      context 'using writer methods' do
+        it 'should return a new instance with the expected value set' do
+          c = Craigslist.category(:bikes)
+          c.should be_instance_of Craigslist::Persistable
+          c.category_path.should == 'bia'
+        end
+      end
+
+      context 'using dynamic finder methods' do
+        it 'should return a new instance with the expected value set' do
+          c = Craigslist.bikes
+          c.should be_instance_of Craigslist::Persistable
+          c.category_path.should == 'bia'
+        end
+      end
+    end
+
+    describe 'a correctly formatted block' do
+      it 'should be evaluated and return a new instance with the expected values set' do
+        c = Craigslist {
+          city :seattle
+          category :bikes
+        }
+        c.should be_instance_of Craigslist::Persistable
+        c.city.should == :seattle
+        c.category_path.should == 'bia'
+      end
     end
   end
 
-  context "#categories" do
-    it "should return an Array of categories" do
-      categories = Craigslist.categories
-      categories.should be_a Array
-      categories.length.should be > 10
-    end
-  end
+  describe 'Persistable' do
+    describe 'a chained call to city' do
+      context 'using writer methods' do
+        it 'should return the instance with the expected value set' do
+          c = Craigslist.category(:bikes).city(:seattle)
+          c.should be_instance_of Craigslist::Persistable
+          c.city.should == :seattle
+        end
+      end
 
-  context "#city?" do
-    it "should return true for cities that exist" do
-      Craigslist.city?('seattle').should be true
-      Craigslist.city?('new_york').should be true
-    end
-
-    it "should return false for a city that does not exist" do
-      Craigslist.city?('asfssdf').should be false
-    end
-  end
-
-  context "#category?" do
-    it "should return true for categories that exist" do
-      Craigslist.category?('for_sale').should be true
-      Craigslist.category?('travel_vac').should be true
+      context 'using dynamic finder methods' do
+        it 'should return the instance with the expected value set' do
+          c = Craigslist.category(:bikes).seattle
+          c.should be_instance_of Craigslist::Persistable
+          c.city.should == :seattle
+        end
+      end
     end
 
-    it "should return false for a category that does not exist" do
-      Craigslist.category?('assdfaff').should be false
-    end
-  end
+    describe 'a chained call to category' do
+      context 'using writer methods' do
+        it 'should return a new instance with the expected value set' do
+          c = Craigslist.city(:seattle).category(:bikes)
+          c.should be_instance_of Craigslist::Persistable
+          c.category_path.should == 'bia'
+        end
+      end
 
-  context "#build_uri" do
-    it "should return a valid uri" do
-      Craigslist.build_uri('seattle', 'jjj').should eq "http://seattle.craigslist.org/jjj/"
-    end
-
-    it "should return a valid search uri" do
-      search = {
-        query: "new guitar",
-        type: :only_title,
-      }
-
-      uri = Craigslist.build_uri('seattle', 'sss', search)
-      uri.should eq "http://seattle.craigslist.org/search/sss?query=new+guitar&srchType=T"
-    end
-  end
-
-  context "#more_results" do
-    it "should return a valid craigslisturl for more results" do
-      correct_uri = "http://seattle.craigslist.org/jjj/index400.html"
-      Craigslist.more_results('http://seattle.craigslist.org/jjj/', '4').should eq correct_uri
-    end
-
-    it "should provide a valid url that Nokogiri can open" do
-      uri = Craigslist.more_results('http://seattle.craigslist.org/jjj/', '4')
-      doc = Nokogiri::HTML(open(uri))
-      doc.xpath("//p[@class = 'row']").length.should be > 0
-    end
-  end
-
-  context "a city method" do
-    it "should return its receiver so that method calls can be chained" do
-      craigslist = Craigslist
-      craigslist.seattle.should be craigslist
-    end
-  end
-
-  context "a category method" do
-    it "should return its receiver so that method calls can be chained" do
-      craigslist = Craigslist
-      craigslist.for_sale.should be craigslist
-    end
-  end
-
-  context "#search" do
-    it "should return results with query matching each post title" do
-      posts = Craigslist.seattle.for_sale.search(query: "guitar", type: :only_title).last
-      posts.should be_a Array
-      posts.length.should eq 20
-      posts.each { |post| post["text"].should =~ /guitar/i }
-    end
-  end
-
-  context "#last" do
-    it "should return the default number of last posts for seattle and
-      for_sale" do
-      posts = Craigslist.seattle.for_sale.last
-      posts.should be_a Array
-      posts.length.should eq 20
-    end
-
-    it "should return a specific number of last posts for seattle and
-      for_sale" do
-      max_results = 2
-      posts = Craigslist.seattle.for_sale.last(max_results)
-      posts.should be_a Array
-      posts.length.should eq max_results
-    end
-
-    it "should be able to handle a request for over 100 results" do
-      max_results = 150
-      posts = Craigslist.new_york.for_sale.bikes.last(max_results)
-      posts.should be_a Array
-      posts.length.should eq max_results
-    end
-
-    it "should have content in each result" do
-      max_results = 20
-      posts = Craigslist.new_york.for_sale.bikes.last(max_results)
-      posts.each do |post|
-        post['text'].should_not be nil
-        post['href'].should_not be nil
+      context 'using dynamic finder methods' do
+        it 'should return a new instance with the expected value set' do
+          c = Craigslist.city(:seattle).bikes
+          c.should be_a Craigslist::Persistable
+          c.category_path.should == 'bia'
+        end
       end
     end
   end

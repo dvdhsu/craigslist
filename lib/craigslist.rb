@@ -1,43 +1,64 @@
 require 'open-uri'
 require 'nokogiri'
 
-require_relative 'craigslist/cities'
+require_relative 'craigslist/persistable'
+require_relative 'craigslist/net'
 require_relative 'craigslist/categories'
-require_relative 'craigslist/craigslist'
-require_relative 'helpers'
 
 module Craigslist
-  PERSISTENT = Persistent.new
-
   class << self
-    def clear
-      Craigslist::PERSISTENT.city = nil
-      Craigslist::PERSISTENT.category = nil
-      Craigslist::PERSISTENT.search = nil
-      self
+
+    # Returns a new persistable instance with the city set
+    def city(city)
+      Persistable.new(city: city)
     end
 
-    def cities
-      CITIES.keys.sort
+    # Returns a new persistable instance with the category set
+    def category(category)
+      Persistable.new(category: category)
     end
 
+    # Handles dynamic finder methods for valid cities and categories
+    def method_missing(name, *args, &block)
+      if found_category = category_path_by_name(name)
+        Persistable.new(category_path: found_category)
+      elsif found_city = valid_city?(name)
+        Persistable.new(city: name)
+      else
+        super
+      end
+    end
+
+    # Returns and array of all stored categories
     def categories
       categories = CATEGORIES.keys
+
       CATEGORIES.each do |key, value|
-        categories.concat(value['children'].keys) if value['children']
+        categories.concat(value[:children].keys) if value[:children]
       end
+
       categories.sort
     end
 
-    def city?(city)
-      CITIES.keys.include?(city)
+    # Returns true if the given city path is valid
+    def valid_city?(city_path)
+      begin
+        uri = Craigslist::Net::build_city_uri(city_path)
+        uri = URI.parse(uri)
+        uri.open.status[0] == '200'
+      rescue => detail
+        false
+      end
     end
 
-    def category?(category)
+    # Returns true if the given category name is valid
+    def valid_category_name?(category)
+      category = category.to_sym
+
       return true if CATEGORIES.keys.include?(category)
 
       CATEGORIES.each do |key, value|
-        if value['children'] && value['children'].keys.include?(category)
+        if value[:children] && value[:children].keys.include?(category)
           return true
         end
       end
@@ -45,111 +66,39 @@ module Craigslist
       return false
     end
 
-    # Create city methods
-    CITIES.each do |key, value|
-      define_method(key.to_sym) do
-        Craigslist::PERSISTENT.city = value
-        self
-      end
-    end
+    # Returns true if the given category path is valid
+    def valid_category_path?(category_path)
+      CATEGORIES.each do |key, value|
+        if value[:path] && value[:path] == category_path
+          return true
+        end
 
-    # Create category methods
-    CATEGORIES.each do |key, value|
-      if value['path']
-        define_method(key.to_sym) do
-          Craigslist::PERSISTENT.category = value['path']
-          self
+        if value[:children] && value[:children].values.include?(category_path)
+          return true
         end
       end
 
-      if value['children']
-        value['children'].each do |key, value|
-          define_method(key.to_sym) do
-            Craigslist::PERSISTENT.category = value
-            self
-          end
-        end
-      end
+      return false
     end
 
-    def more_results(uri, result_count=0, search=nil)
-      if search
-        uri + "&s=#{result_count.to_i * 100}"
-      else
-        uri + "index#{result_count.to_i * 100}.html"
-      end
-    end
+    # Returns the category path given the category name, returns false otherwise
+    def category_path_by_name(category)
+      category = category.to_sym
 
-    def build_city_uri(city_path)
-      "http://#{city_path}.craigslist.org"
-    end
+      return CATEGORIES[category][:path] if CATEGORIES.keys.include?(category)
 
-    SEARCH_TYPE = {
-      entire_post: "A",
-      only_title:  "T",
-    }
-
-    def build_uri(city_path, category_path, search=nil)
-      if search
-        query_string = Helpers.build_query(
-          query: search.fetch(:query),
-          srchType: SEARCH_TYPE[search.fetch(:type, :only_title)],
-        )
-
-        "#{build_city_uri(city_path)}/search/#{category_path}?%s" % query_string
-      else
-        "#{build_city_uri(city_path)}/#{category_path}/"
-      end
-    end
-
-    def search(params)
-      Craigslist::PERSISTENT.search = params
-      self
-    end
-
-    def last(max_results=20)
-      raise StandardError, "city and category must be part of the method chain" unless
-        Craigslist::PERSISTENT.city && Craigslist::PERSISTENT.category
-
-      uri = self.build_uri(Craigslist::PERSISTENT.city, Craigslist::PERSISTENT.category, Craigslist::PERSISTENT.search)
-      search_results = []
-
-      for i in 0..(max_results / 100)
-        uri = self.more_results(uri, i, Craigslist::PERSISTENT.search) if i > 0
-        doc = Nokogiri::HTML(open(uri))
-
-        doc.css("p.row").each do |node|
-          search_result = {}
-
-          title = node.at_css(".pl a")
-          search_result['text'] = title.text.strip
-          search_result['href'] = title['href']
-
-          info = node.at_css(".l2 .pnr")
-
-          if price = info.at_css(".price")
-            search_result['price'] = price.text.strip
-          else
-            search_result['price'] = nil
-          end
-
-          if location = info.at_css("small")
-            search_result['location'] = location.text.strip[1..-2].strip # remove brackets
-          else
-            search_result['location'] = nil
-          end
-
-          attributes = info.at_css(".px").text
-
-          search_result['has_img'] = attributes.include?('img') ? true : false
-          search_result['has_pic'] = attributes.include?('pic') ? true : false
-
-          search_results << search_result
-          break if search_results.length == max_results
+      CATEGORIES.each do |key, value|
+        if value[:children] && value[:children].keys.include?(category)
+          return value[:children][category]
         end
       end
 
-      search_results
+      return false
     end
   end
+end
+
+# Gateway method for shortcut access to the persistable
+def Craigslist(*args, &block)
+  Craigslist::Persistable.new(*args, &block)
 end
