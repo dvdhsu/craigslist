@@ -12,38 +12,37 @@ require 'craigslist'
 # A direct call to a city or category method will return an instance of the
 # internal persistable object
 Craigslist.city(:seattle)
-=> #<Craigslist::Persistable:0x0000 @city=:seattle>
+=> <Craigslist::Persistable:0x0000 @city=:seattle>
 
 # Additional setter methods can be chained to the persistable
 
 # Setting a category such as :bikes will set the category_path which is mapped
 # internally
 Craigslist.city(:seattle).category(:bikes)
-=> #<Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
+=> <Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
 
 # Internal search criteria may be more conveniently set using dynamic methods
 # for city and category
-
 Craigslist.seattle.bikes
-=> #<Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
+=> <Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
 
 # Any subsequent chained methods will override any previously set attributes
 c = Craiglist.seattle.bikes.limit(20).max_ask(200)
-=> #<Craigslist::Persistable:0x0000
+=> <Craigslist::Persistable:0x0000
  @city=:seattle,
  @category_path="bia",
  @limit=20,
  @max_ask=200>
 
 c.sfbay.limit(10).max_ask(100)
-=> #<Craigslist::Persistable:0x0000
+=> <Craigslist::Persistable:0x0000
  @city=:sfbay,
  @category_path="bia",
  @limit=10,
  @max_ask=100>
 
-# The persistable may also be instantiated given a block of
-# attributes and their respective arguments
+# The persistable may also be instantiated given a block of attributes and
+# their respective arguments
 Craigslist do
   city :seattle
   category :bikes
@@ -54,7 +53,7 @@ Craigslist do
   min_ask 100
   max_ask 200
 end
-=> #<Craigslist::Persistable:0x0000
+=> <Craigslist::Persistable:0x0000
  @city=:seattle,
  @category_path="bia",
  @limit=10,
@@ -85,7 +84,7 @@ Craigslist.valid_category?(:bikes)
 # If the desired category is not mapped within the gem, the category_path can
 # be set manually
 Craigslist.seattle.category_path('bia')
-=> #<Craigslist::Persistable:0x0000 @city=:seattle, category_path="bia">
+=> <Craigslist::Persistable:0x0000 @city=:seattle, category_path="bia">
 ```
 
 ### Fetching results
@@ -97,10 +96,10 @@ require 'craigslist'
 Craigslist.seattle.bikes.fetch
 => [{}, ...n]
 
-# Max results can be specified in an argument to #fetch. Results can
-# span multiple pages
+# Max results can be specified in an argument to #fetch. Results can span
+# multiple pages
 Craigslist.seattle.bikes.fetch(150)
-=> [{}, ...n*150]
+=> [{}, ...150]
 
 # Max results can also be specified by setting the limit either in the chained
 # method syntax or the block syntax
@@ -115,7 +114,7 @@ c = Craigslist do
 end
 
 c.fetch
-=> [{}, ...n*10]
+=> [{}, ...10]
 ```
 
 ## Contributing
