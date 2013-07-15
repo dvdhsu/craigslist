@@ -2,63 +2,125 @@
 
 Unofficial Ruby interface for programmatically accessing Craigslist listings. This gem is intended for research purposes only.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'craigslist'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install craigslist
-
 ## Usage
+
+### Instantiation
 
 ```ruby
 require 'craigslist'
 
-# Return an array of posts for a city and category.
-Craigslist.seattle.for_sale.last
+# A direct call to a city or category method will return an instance of the
+# internal persistable object
+Craigslist.city(:seattle)
+=> #<Craigslist::Persistable:0x0000 @city=:seattle>
 
-# Note that any additional category in the method chain will override any
-# previous category. The same is true for cities.
-# In this example 'bikes' is the category that is used, not 'for sale'.
-Craigslist.seattle.for_sale.bikes.last
+# Additional setter methods can be chained to the persistable
 
-# Also note that category can come before city in the method chain with no
-# change in results.
-Craigslist.for_sale.seattle.last
+# Setting a category such as :bikes will set the category_path which is mapped
+# internally
+Craigslist.city(:seattle).category(:bikes)
+=> #<Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
 
-# The max_results can be specified in an argument to #last. Max results can
-# span multiple pages
-Craigslist.seattle.for_sale.last(40)
+# Internal search criteria may be more conveniently set using dynamic methods
+# for city and category
 
-# Return an array of supported cities.p
-Craigslist.cities
+Craigslist.seattle.bikes
+=> #<Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
 
-# Return an array of supported categories.
+# Any subsequent chained methods will override any previously set attributes
+c = Craiglist.seattle.bikes.limit(20).max_ask(200)
+=> #<Craigslist::Persistable:0x0000
+ @city=:seattle,
+ @category_path="bia",
+ @limit=20,
+ @max_ask=200>
+
+c.sfbay.limit(10).max_ask(100)
+=> #<Craigslist::Persistable:0x0000
+ @city=:sfbay,
+ @category_path="bia",
+ @limit=10,
+ @max_ask=100>
+
+# The persistable may also be instantiated given a block of
+# attributes and their respective arguments
+Craigslist do
+  city :seattle
+  category :bikes
+  limit 10
+  query 'road bike'
+  search_type :T
+  has_image true
+  min_ask 100
+  max_ask 200
+end
+=> #<Craigslist::Persistable:0x0000
+ @city=:seattle,
+ @category_path="bia",
+ @limit=10,
+ @query="road bike",
+ @search_type=:T,
+ @has_image=true,
+ @min_ask=100,
+ @max_ask=200>
+```
+
+### Helpers
+
+```ruby
+require 'craigslist'
+
+# Return true if the city is a valid subdomain
+Craigslist.valid_city?(:seattle)
+=> true
+
+# Return an array of internally mappped categories
 Craigslist.categories
+=> [:bikes, :books]
 
-# Return true if the city is supported.
-Craigslist.city?('seattle')
+# Return true if the category is internally mapped to its category path
+Craigslist.valid_category?(:bikes)
 => true
 
-# Return true if the category is supported.
-Craigslist.category?('for_sale')
-=> true
+# If the desired category is not mapped within the gem, the category_path can
+# be set manually
+Craigslist.seattle.category_path('bia')
+=> #<Craigslist::Persistable:0x0000 @city=:seattle, category_path="bia">
+```
+
+### Fetching results
+
+```ruby
+require 'craigslist'
+
+# In its simplest usage, posts can be output using a chained method syntax
+Craigslist.seattle.bikes.fetch
+=> [{}, ...n]
+
+# Max results can be specified in an argument to #fetch. Results can
+# span multiple pages
+Craigslist.seattle.bikes.fetch(150)
+=> [{}, ...n*150]
+
+# Max results can also be specified by setting the limit either in the chained
+# method syntax or the block syntax
+c = Craigslist.seattle.bikes.limit(10)
+
+# OR
+
+c = Craigslist do
+  city :seattle
+  category :bikes
+  limit 10
+end
+
+c.fetch
+=> [{}, ...n*10]
 ```
 
 ## Contributing
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+Contributions are welcome and appreciated.
 
 ## Notice
 

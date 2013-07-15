@@ -1,11 +1,24 @@
+require 'open-uri'
+require 'nokogiri'
+
 module Craigslist
   class Persistable
+    DEFAULTS = {
+      limit: 100,
+      query: nil,
+      search_type: :A,
+      has_image: false,
+      min_ask: nil,
+      max_ask: nil
+    }
+
     def initialize(*args, &block)
       if block_given?
         instance_eval(&block)
+        set_uninitialized_defaults_as_instance_variables
         self
       else
-        options = args[0]
+        options = DEFAULTS.merge(args[0])
 
         options.each do |key, value|
           self.send(key.to_sym, value)
@@ -13,50 +26,58 @@ module Craigslist
 
         self
       end
-
-      @results = []
     end
 
-    def fetch(max_results=20)
-      uri = Craigslist::Net::build_uri(@city, @category_path)
-      search_results = []
+    def fetch(max_results=@limit)
+      raise StandardError, 'city and category must be set before fetching results' if
+        @city.nil? || @category_path.nil?
 
-      for i in 0..(max_results / 100)
-        # uri = self.more_results(uri, i, PERSISTENT.search_query) if i > 0
+      options = {
+        query: @query,
+        search_type: @search_type,
+        has_image: @has_image,
+        min_ask: @min_ask,
+        max_ask: @max_ask
+      }
+
+      uri = Craigslist::Net::build_uri(@city, @category_path, options)
+      results = []
+
+      for i in 0..(([max_results - 1, -1].max) / 100)
+        uri = Craigslist::Net::build_uri(@city, @category_path, options, i) if i > 0
         doc = Nokogiri::HTML(open(uri))
 
         doc.css('p.row').each do |node|
-          search_result = {}
+          result = {}
 
           title = node.at_css('.pl a')
-          search_result['text'] = title.text.strip
-          search_result['href'] = title['href']
+          result['text'] = title.text.strip
+          result['href'] = title['href']
 
           info = node.at_css('.l2 .pnr')
 
           if price = info.at_css('.price')
-            search_result['price'] = price.text.strip
+            result['price'] = price.text.strip
           else
-            search_result['price'] = nil
+            result['price'] = nil
           end
 
           if location = info.at_css('small')
             # Remove brackets
-            search_result['location'] = location.text.strip[1..-2].strip
+            result['location'] = location.text.strip[1..-2].strip
           else
-            search_result['location'] = nil
+            result['location'] = nil
           end
 
           attributes = info.at_css('.px').text
+          result['has_img'] = attributes.include?('img') || attributes.include?('pic')
 
-          search_result['has_img'] = attributes.include?('img') || attributes.include?('pic')
-
-          search_results << search_result
-          break if search_results.length == max_results
+          results << result
+          break if results.length == max_results
         end
       end
 
-      @results = search_results
+      results
     end
 
     # Simple reader methods
@@ -75,7 +96,7 @@ module Craigslist
       if category_path
         self.category_path = category_path
       else
-        raise ArgumentError, 'Category name not found. You may need to set the category_path manually.'
+        raise ArgumentError, 'category name not found. You may need to set the category_path manually.'
       end
     end
 
@@ -84,37 +105,137 @@ module Craigslist
       self
     end
 
-    # Methods compatible with writing from block with instance_eval also serve
-    # as simple reader methods
-
-    def city(city=nil)
-      if city
-        @city = city
-        self
-      else
-        @city
-      end
+    def limit=(limit)
+      raise ArgumentError, 'limit must be greater than 0' unless
+        limit != nil && limit > 0
+      @limit = limit
+      self
     end
+
+    def query=(query)
+      raise ArgumentError, 'query must be a string' unless
+        query.nil? || query.is_a?(String)
+      @query = query
+      self
+    end
+
+    def search_type=(search_type)
+      raise ArgumentError, 'search_type must be one of :A, :T' unless
+        search_type == :A || search_type == :T
+      @search_type = search_type
+      self
+    end
+
+    def has_image=(has_image)
+      raise ArgumentError, 'has_image must be a boolean' unless
+        has_image.is_a?(TrueClass) || has_image.is_a?(FalseClass)
+      @has_image = has_image
+      self
+    end
+
+    def min_ask=(min_ask)
+      raise ArgumentError, 'min_ask must be at least 0' unless
+        min_ask.nil? || min_ask >= 0
+      @min_ask = min_ask
+      self
+    end
+
+    def max_ask=(max_ask)
+      raise ArgumentError, 'max_ask must be at least 0' unless
+        max_ask.nil? || max_ask >= 0
+      @max_ask = max_ask
+      self
+    end
+
+    # Methods compatible with writing from block with instance_eval also serve
+    # as simple reader methods. Object serves as the toggle between reader and
+    # writer methods and thus is the only object which cannot be set explicitly.
+    # Category is the outlier here because it's not accessible for reading
+    # since it does not persist as an instance variable.
 
     def category(category)
       self.category = category
       self
     end
 
-    def category_path(category_path=nil)
-      if category_path
-        @category_path = category_path
-        self
+    def city(city=Object)
+      if city == Object
+        @city
       else
-        @category_path
+        self.city = city
+        self
       end
     end
 
-    # Other
+    def category_path(category_path=Object)
+      if category_path == Object
+        @category_path
+      else
+        self.category_path = category_path
+        self
+      end
+    end
+
+    def limit(limit=Object)
+      if limit == Object
+        @limit
+      else
+        self.limit = limit
+        self
+      end
+    end
+
+    def query(query=Object)
+      if query == Object
+        @query
+      else
+        self.query = query
+        self
+      end
+    end
+
+    def search_type(search_type=Object)
+      if search_type == Object
+        @search_type
+      else
+        self.search_type = search_type
+        self
+      end
+    end
+
+    def has_image(has_image=Object)
+      if has_image == Object
+        @has_image
+      else
+        self.has_image = has_image
+        self
+      end
+    end
+
+    def min_ask(min_ask=Object)
+      if min_ask == Object
+        @min_ask
+      else
+        self.min_ask = min_ask
+        self
+      end
+    end
+
+    def max_ask(max_ask=Object)
+      if max_ask == Object
+        @max_ask
+      else
+        self.max_ask = max_ask
+        self
+      end
+    end
+
+    # Misc
 
     def clear
       @city = nil
       @category_path = nil
+      reset_defaults
       self
     end
 
@@ -122,11 +243,29 @@ module Craigslist
       if found_category = Craigslist::category_path_by_name(name)
         self.category_path = found_category
         self
-      elsif found_city = Craigslist::valid_city?(name)
+      elsif Craigslist::valid_city?(name)
         self.city = name
         self
       else
         super
+      end
+    end
+
+    private
+
+    def set_uninitialized_defaults_as_instance_variables
+      DEFAULTS.each do |key, value|
+        var_name = "@#{key}".to_sym
+        if instance_variable_get(var_name).nil?
+          self.instance_variable_set(var_name, value)
+        end
+      end
+    end
+
+    def reset_defaults
+      DEFAULTS.each do |key, value|
+        var_name = "@#{key}".to_sym
+        self.instance_variable_set(var_name, value)
       end
     end
   end

@@ -107,15 +107,75 @@ describe 'Craigslist' do
       end
     end
 
+    describe 'an initial call to limit' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.limit(200)
+        c.should be_instance_of Craigslist::Persistable
+        c.limit.should == 200
+      end
+    end
+
+    describe 'an initial call to query' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.query('test')
+        c.should be_instance_of Craigslist::Persistable
+        c.query.should == 'test'
+      end
+    end
+
+    describe 'an initial call to search_type' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.search_type(:T)
+        c.should be_instance_of Craigslist::Persistable
+        c.search_type.should == :T
+      end
+    end
+
+    describe 'an initial call to has_image' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.has_image(true)
+        c.should be_instance_of Craigslist::Persistable
+        c.has_image.should == true
+      end
+    end
+
+    describe 'an initial call to min_ask' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.min_ask(100)
+        c.should be_instance_of Craigslist::Persistable
+        c.min_ask.should == 100
+      end
+    end
+
+    describe 'an initial call to max_ask' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.max_ask(200)
+        c.should be_instance_of Craigslist::Persistable
+        c.max_ask.should == 200
+      end
+    end
+
     describe 'a correctly formatted block' do
       it 'should be evaluated and return a new instance with the expected values set' do
         c = Craigslist {
           city :seattle
           category :bikes
+          limit 200
+          query 'test'
+          search_type :T
+          has_image true
+          min_ask 100
+          max_ask 200
         }
         c.should be_instance_of Craigslist::Persistable
         c.city.should == :seattle
         c.category_path.should == 'bia'
+        c.limit.should == 200
+        c.query.should == 'test'
+        c.search_type.should == :T
+        c.has_image.should == true
+        c.min_ask.should == 100
+        c.max_ask.should == 200
       end
     end
   end
@@ -153,6 +213,96 @@ describe 'Craigslist' do
           c = Craigslist.city(:seattle).bikes
           c.should be_a Craigslist::Persistable
           c.category_path.should == 'bia'
+        end
+      end
+    end
+
+    describe 'a chained call to limit' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.city(:seattle).limit(200)
+        c.should be_instance_of Craigslist::Persistable
+        c.limit.should == 200
+      end
+    end
+
+    describe 'a chained call to query' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.city(:seattle).query('test')
+        c.should be_instance_of Craigslist::Persistable
+        c.query.should == 'test'
+      end
+    end
+
+    describe 'a chained call to search_type' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.city(:seattle).search_type(:T)
+        c.should be_instance_of Craigslist::Persistable
+        c.search_type.should == :T
+      end
+    end
+
+    describe 'a chained call to has_image' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.city(:seattle).has_image(true)
+        c.should be_instance_of Craigslist::Persistable
+        c.has_image.should == true
+      end
+    end
+
+    describe 'a chained call to min_ask' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.city(:seattle).min_ask(100)
+        c.should be_instance_of Craigslist::Persistable
+        c.min_ask.should == 100
+      end
+    end
+
+    describe 'a chained call to max_ask' do
+      it 'should return a new instance with the expected value set' do
+        c = Craigslist.city(:seattle).max_ask(200)
+        c.should be_instance_of Craigslist::Persistable
+        c.max_ask.should == 200
+      end
+    end
+
+    describe '#fetch' do
+      describe 'a request to fetch 1 result' do
+        it 'should return an Array with length of 1' do
+          res = Craigslist.city(:seattle).category(:bikes).fetch(1)
+          res.should be_instance_of Array
+          res.length.should == 1
+        end
+      end
+
+      describe 'a request to fetch 100 results' do
+        it 'should return an Array with length of 100' do
+          res = Craigslist.city(:seattle).category(:bikes).fetch(100)
+          res.should be_instance_of Array
+          res.length.should == 100
+        end
+      end
+
+      describe 'a request to fetch 150 results (more than 1 page of results)' do
+        it 'should return an Array with length of 150' do
+          res = Craigslist.city(:seattle).category(:bikes).fetch(150)
+          res.should be_instance_of Array
+          res.length.should == 150
+        end
+      end
+
+      describe 'a request to fetch 0 results' do
+        it 'should return an Array with length of 0' do
+          res = Craigslist.city(:seattle).category(:bikes).fetch(0)
+          res.should be_instance_of Array
+          res.length.should == 0
+        end
+      end
+
+      describe 'a request with the limit set' do
+        it 'should enforce the limit' do
+          res = Craigslist.city(:seattle).category(:bikes).limit(1).fetch
+          res.should be_instance_of Array
+          res.length.should == 1
         end
       end
     end

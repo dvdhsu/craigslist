@@ -1,28 +1,34 @@
 require 'open-uri'
-require 'nokogiri'
 
 require_relative 'craigslist/persistable'
 require_relative 'craigslist/net'
 require_relative 'craigslist/categories'
 
 module Craigslist
+  INITIALIZING_METHODS = [
+    :city, :category, :query, :search_type, :limit, :has_image, :min_ask, :max_ask
+  ]
+
   class << self
 
-    # Returns a new persistable instance with the city set
-    def city(city)
-      Persistable.new(city: city)
-    end
-
-    # Returns a new persistable instance with the category set
-    def category(category)
-      Persistable.new(category: category)
+    # Create methods to return a new persistable object with the given value set.
+    # This essentially creates methods resembling the following:
+    #
+    # def city(city)
+    #   Persistable.new(city: city)
+    # end
+    #
+    INITIALIZING_METHODS.each do |value|
+      define_method(value) do |arg|
+        Persistable.new(value => arg)
+      end
     end
 
     # Handles dynamic finder methods for valid cities and categories
     def method_missing(name, *args, &block)
       if found_category = category_path_by_name(name)
         Persistable.new(category_path: found_category)
-      elsif found_city = valid_city?(name)
+      elsif valid_city?(name)
         Persistable.new(city: name)
       else
         super
@@ -46,7 +52,7 @@ module Craigslist
         uri = Craigslist::Net::build_city_uri(city_path)
         uri = URI.parse(uri)
         uri.open.status[0] == '200'
-      rescue => detail
+      rescue => e
         false
       end
     end

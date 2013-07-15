@@ -1,7 +1,15 @@
-# require 'cgi'
+require 'open-uri'
 
 module Craigslist
   module Net
+    OPTIONS_MAP = {
+      query: 'query',
+      search_type: 'searchType',
+      has_image: 'hasPic',
+      min_ask: 'min_ask',
+      max_ask: 'max_ask'
+    }
+
     class << self
       def build_query(params)
         params.map { |k, v|
@@ -22,9 +30,13 @@ module Craigslist
         "http://#{city_path}.craigslist.org"
       end
 
-      def build_uri(city_path, category_path)
+      def build_uri(city_path, category_path, options, max_results=nil)
         "#{build_city_uri(city_path)}/#{category_path}/"
       end
+
+      # def paginated_uri(uri, max_results=0)
+      #   uri + "index#{max_results.to_i * 100}.html"
+      # end
 
       # Returns a Craigslist uri given a city subdomain, category path, and
       # optional search query
