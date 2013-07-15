@@ -1,6 +1,6 @@
 # Craigslist GEM [![Build Status](https://secure.travis-ci.org/gregstallings/craigslist.png)](http://travis-ci.org/gregstallings/craigslist)
 
-Unofficial Ruby interface for programmatically accessing Craigslist listings. This gem is intended for research purposes only.
+Unofficial Ruby interface for programmatically accessing Craigslist listings.
 
 ## Usage
 
