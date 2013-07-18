@@ -135,7 +135,7 @@ describe 'Craigslist' do
       it 'should return a new instance with the expected value set' do
         c = Craigslist.has_image(true)
         c.should be_instance_of Craigslist::Persistable
-        c.has_image.should == true
+        c.has_image.should == 1
       end
     end
 
@@ -173,7 +173,7 @@ describe 'Craigslist' do
         c.limit.should == 200
         c.query.should == 'test'
         c.search_type.should == :T
-        c.has_image.should == true
+        c.has_image.should == 1
         c.min_ask.should == 100
         c.max_ask.should == 200
       end
@@ -245,7 +245,7 @@ describe 'Craigslist' do
       it 'should return a new instance with the expected value set' do
         c = Craigslist.city(:seattle).has_image(true)
         c.should be_instance_of Craigslist::Persistable
-        c.has_image.should == true
+        c.has_image.should == 1
       end
     end
 
