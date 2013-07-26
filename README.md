@@ -73,9 +73,9 @@ require 'craigslist'
 Craigslist.valid_city?(:seattle)
 => true
 
-# Return an array of internally mappped categories
+# Return an array of internally mapped categories
 Craigslist.categories
-=> [:bikes, :books]
+=> [:bikes, :books, ...]
 
 # Return true if the category is internally mapped to its category path
 Craigslist.valid_category?(:bikes)

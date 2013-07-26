@@ -7,24 +7,21 @@ module Craigslist
       limit: 100,
       query: nil,
       search_type: :A,
-      has_image: false,
       min_ask: nil,
-      max_ask: nil
+      max_ask: nil,
+      has_image: false
     }
 
     def initialize(*args, &block)
       if block_given?
         instance_eval(&block)
         set_uninitialized_defaults_as_instance_variables
-        self
       else
         options = DEFAULTS.merge(args[0])
 
-        options.each do |key, value|
-          self.send(key.to_sym, value)
+        options.each do |k, v|
+          self.send(k.to_sym, v)
         end
-
-        self
       end
     end
 
@@ -35,16 +32,16 @@ module Craigslist
       options = {
         query: @query,
         search_type: @search_type,
-        has_image: @has_image,
         min_ask: @min_ask,
-        max_ask: @max_ask
+        max_ask: @max_ask,
+        has_image: @has_image
       }
 
       uri = Craigslist::Net::build_uri(@city, @category_path, options)
       results = []
 
       for i in 0..(([max_results - 1, -1].max) / 100)
-        uri = Craigslist::Net::build_uri(@city, @category_path, options, i) if i > 0
+        uri = Craigslist::Net::build_uri(@city, @category_path, options, i * 100) if i > 0
         doc = Nokogiri::HTML(open(uri))
 
         doc.css('p.row').each do |node|
@@ -129,7 +126,9 @@ module Craigslist
     def has_image=(has_image)
       raise ArgumentError, 'has_image must be a boolean' unless
         has_image.is_a?(TrueClass) || has_image.is_a?(FalseClass)
-      @has_image = has_image
+
+      # Store this value as an integer
+      @has_image = has_image ? 1 : 0
       self
     end
 
@@ -254,18 +253,18 @@ module Craigslist
     private
 
     def set_uninitialized_defaults_as_instance_variables
-      DEFAULTS.each do |key, value|
-        var_name = "@#{key}".to_sym
+      DEFAULTS.each do |k, v|
+        var_name = "@#{k}".to_sym
         if instance_variable_get(var_name).nil?
-          self.instance_variable_set(var_name, value)
+          self.instance_variable_set(var_name, v)
         end
       end
     end
 
     def reset_defaults
-      DEFAULTS.each do |key, value|
-        var_name = "@#{key}".to_sym
-        self.instance_variable_set(var_name, value)
+      DEFAULTS.each do |k, v|
+        var_name = "@#{k}".to_sym
+        self.instance_variable_set(var_name, v)
       end
     end
   end

@@ -2,15 +2,64 @@ require 'open-uri'
 
 module Craigslist
   module Net
-    OPTIONS_MAP = {
-      query: 'query',
-      search_type: 'searchType',
-      has_image: 'hasPic',
-      min_ask: 'min_ask',
-      max_ask: 'max_ask'
+    OPTIONS_PARAMS_MAP = {
+      query: :query,
+      search_type: :searchType,
+      min_ask: :minAsk,
+      max_ask: :maxAsk,
+      has_image: :hasPic
     }
 
     class << self
+
+      # Returns a Craigslist uri given the city subdomain
+      def build_city_uri(city_path)
+        "http://#{city_path}.craigslist.org"
+      end
+
+      # Returns a Craigslist uri given city path, category path, options
+      # including search, and offset
+      def build_uri(city_path, category_path, options, offset=nil)
+
+        # Vary url if any of the search options are not set
+        if options[:query].nil? && options[:min_ask].nil? &&
+           options[:max_ask].nil? && options[:has_image] == 0
+
+          # Use the non-search uri
+          uri = "#{build_city_uri(city_path)}/#{category_path}/"
+
+          if offset && offset > 0
+            uri = uri + "index#{offset}.html"
+          end
+
+          uri
+          p uri
+        else
+          # Use the search uri
+
+          # Remove options with nil values
+          options.reject! {|k, v| v.nil? }
+
+          # Remove has_image if 0
+          options.delete(:has_image) if options[:has_image] == 0
+
+          # Replace the options keys with the keys from the map
+          params = Hash[options.map {|k, v| [OPTIONS_PARAMS_MAP[k], v] }]
+
+          # Prepend offset to params if not first page
+          if offset && offset > 0
+            params = Hash[s: offset].merge(params)
+          end
+
+          query_string = build_query(params)
+
+          uri = "#{build_city_uri(city_path)}/search/#{category_path}?" + query_string
+          p uri
+        end
+      end
+
+      private
+
       def build_query(params)
         params.map { |k, v|
           if v.class == Array
@@ -24,34 +73,6 @@ module Craigslist
       def escape(s)
         URI.encode_www_form_component(s)
       end
-
-      # Returns a Craigslist uri given the city subdomain
-      def build_city_uri(city_path)
-        "http://#{city_path}.craigslist.org"
-      end
-
-      def build_uri(city_path, category_path, options, max_results=nil)
-        "#{build_city_uri(city_path)}/#{category_path}/"
-      end
-
-      # def paginated_uri(uri, max_results=0)
-      #   uri + "index#{max_results.to_i * 100}.html"
-      # end
-
-      # Returns a Craigslist uri given a city subdomain, category path, and
-      # optional search query
-      # def build_uri(city_path, category_path, search_query=nil)
-      #   if search
-      #     query_string = build_query(
-      #       query: search.fetch(:search_query),
-      #       srchType: SEARCH_TYPE[search.fetch(:type, :only_title)],
-      #     )
-
-      #     "#{build_city_uri(city_path)}/search/#{category_path}?%s" % query_string
-      #   else
-      #     "#{build_city_uri(city_path)}/#{category_path}/"
-      #   end
-      # end
     end
   end
 end

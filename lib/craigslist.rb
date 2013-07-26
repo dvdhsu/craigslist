@@ -18,9 +18,9 @@ module Craigslist
     #   Persistable.new(city: city)
     # end
     #
-    INITIALIZING_METHODS.each do |value|
-      define_method(value) do |arg|
-        Persistable.new(value => arg)
+    INITIALIZING_METHODS.each do |v|
+      define_method(v) do |arg|
+        Persistable.new(v => arg)
       end
     end
 
@@ -39,8 +39,8 @@ module Craigslist
     def categories
       categories = CATEGORIES.keys
 
-      CATEGORIES.each do |key, value|
-        categories.concat(value[:children].keys) if value[:children]
+      CATEGORIES.each do |k, v|
+        categories.concat(v[:children].keys) if v[:children]
       end
 
       categories.sort
@@ -63,28 +63,28 @@ module Craigslist
 
       return true if CATEGORIES.keys.include?(category)
 
-      CATEGORIES.each do |key, value|
-        if value[:children] && value[:children].keys.include?(category)
+      CATEGORIES.each do |k, v|
+        if v[:children] && v[:children].keys.include?(category)
           return true
         end
       end
 
-      return false
+      false
     end
 
     # Returns true if the given category path is valid
     def valid_category_path?(category_path)
-      CATEGORIES.each do |key, value|
-        if value[:path] && value[:path] == category_path
+      CATEGORIES.each do |k, v|
+        if v[:path] && v[:path] == category_path
           return true
         end
 
-        if value[:children] && value[:children].values.include?(category_path)
+        if v[:children] && v[:children].values.include?(category_path)
           return true
         end
       end
 
-      return false
+      false
     end
 
     # Returns the category path given the category name, returns false otherwise
@@ -93,13 +93,13 @@ module Craigslist
 
       return CATEGORIES[category][:path] if CATEGORIES.keys.include?(category)
 
-      CATEGORIES.each do |key, value|
-        if value[:children] && value[:children].keys.include?(category)
-          return value[:children][category]
+      CATEGORIES.each do |k, v|
+        if v[:children] && v[:children].keys.include?(category)
+          return v[:children][category]
         end
       end
 
-      return false
+      false
     end
   end
 end
