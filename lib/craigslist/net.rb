@@ -33,7 +33,6 @@ module Craigslist
           end
 
           uri
-          p uri
         else
           # Use the search uri
 
@@ -54,7 +53,6 @@ module Craigslist
           query_string = build_query(params)
 
           uri = "#{build_city_uri(city_path)}/search/#{category_path}?" + query_string
-          p uri
         end
       end
 

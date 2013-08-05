@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name          = 'craigslist'
-  s.version       = '0.0.3'
+  s.version       = '0.0.4'
   s.platform      = Gem::Platform::RUBY
   s.summary       = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
   s.license       = 'MIT'
