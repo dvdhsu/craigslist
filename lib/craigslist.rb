@@ -35,7 +35,7 @@ module Craigslist
       end
     end
 
-    # Returns and array of all stored categories
+    # Returns an array of all stored categories
     def categories
       categories = CATEGORIES.keys
 
