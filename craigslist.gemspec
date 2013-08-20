@@ -1,25 +1,26 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name          = 'craigslist'
-  s.version       = '0.0.4'
-  s.platform      = Gem::Platform::RUBY
-  s.summary       = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
-  s.license       = 'MIT'
+  s.name = 'craigslist'
+  s.version = '0.0.4'
+  s.platform = Gem::Platform::RUBY
+  s.required_ruby_version = ">= 1.9.3"
+  s.license = 'MIT'
+  s.summary = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
+  s.description = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
+  s.homepage = 'https://github.com/gregstallings/craigslist'
 
-  s.description   = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
+  s.authors = ['Greg Stallings']
+  s.email = ['gregstallings@gmail.com']
 
-  s.files         = `git ls-files`.split($\)
-  s.executables   = s.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  s.files = `git ls-files`.split($\)
+  s.executables = s.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   s.require_paths = ['lib']
-  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+  s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
-  s.authors       = ['Greg Stallings']
-  s.email         = ['gregstallings@gmail.com']
-  s.homepage      = 'https://github.com/gregstallings/craigslist'
-  s.source        = 'https://github.com/gregstallings/craigslist'
+  s.add_runtime_dependency 'nokogiri'
 
-  s.add_dependency 'rake'
-  s.add_dependency 'rspec'
-  s.add_dependency 'nokogiri'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'nokogiri'
 end
