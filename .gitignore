@@ -1,13 +1,12 @@
+# https://github.com/github/gitignore/blob/master/Ruby.gitignore
+# https://github.com/github/gitignore/blob/master/LICENSE
+
 *.gem
 *.rbc
 .bundle
 .config
-.yardoc
-Gemfile.lock
-InstalledFiles
-_yardoc
 coverage
-doc/
+InstalledFiles
 lib/bundler/man
 pkg
 rdoc
@@ -15,4 +14,8 @@ spec/reports
 test/tmp
 test/version_tmp
 tmp
-.DS_Store
+
+# YARD artifacts
+.yardoc
+_yardoc
+doc/
