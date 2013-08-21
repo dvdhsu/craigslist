@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.version = Craigslist::Version
   s.platform = Gem::Platform::RUBY
   s.required_ruby_version = ">= 1.9.3"
-  s.license = 'MIT'
+  s.licenses = ['MIT']
   s.summary = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
-  s.description = %q{Unofficial Ruby DSL for programmatically accessing Craigslist listings.}
+  s.description = s.summary
   s.homepage = 'https://github.com/gregstallings/craigslist'
 
   s.authors = ['Greg Stallings']
