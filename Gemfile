@@ -2,6 +2,11 @@ source 'https://rubygems.org'
 
 gem 'rake', '~> 10.1.0'
 gem 'nokogiri', '~> 1.6.0'
+gem 'yard'
+
+group :development do
+  gem 'pry'
+end
 
 group :test do
   gem 'coveralls', require: false
