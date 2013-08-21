@@ -1,6 +1,7 @@
-require 'craigslist'
 require 'coveralls'
 Coveralls.wear!
+
+require 'craigslist'
 
 describe 'Craigslist' do
   describe 'Module' do
