@@ -1,5 +1,3 @@
-require 'open-uri'
-
 module Craigslist
   module Net
     OPTIONS_PARAMS_MAP = {

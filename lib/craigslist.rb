@@ -1,10 +1,9 @@
+require 'craigslist/categories'
+require 'craigslist/helpers'
+require 'craigslist/net'
+require 'craigslist/persistable'
+require 'craigslist/version'
 require 'open-uri'
-
-require_relative 'craigslist/persistable'
-require_relative 'craigslist/net'
-require_relative 'craigslist/categories'
-require_relative 'craigslist/helpers'
-require_relative 'craigslist/version'
 
 module Craigslist
   extend Helpers
