@@ -124,18 +124,34 @@ c.fetch
 
 ## Installation
 
-```shell
-gem install craigslist
+Add this line to your Gemfile:
+
+```ruby
+gem 'craigslist'
 ```
 
-## Ruby Versions
+Then execute:
+
+```shell
+$ bundle
+```
+
+Or install it yourself as:
+
+```shell
+$ gem install craiglist
+```
+
+## Support
 
 - Ruby 1.9.3
 - Ruby 2.0.0
 
+Due to unpredictable changes in site layout, you may need to modify the `#fetch` method.
+
 ## Contributing
 
-Contributions are welcome and appreciated.
+Meaningful contributions will be accepted.
 
 ## Notice
 
