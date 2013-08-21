@@ -122,6 +122,12 @@ c.fetch
 => [{}, ...10]
 ```
 
+## Installation
+
+```shell
+gem install craigslist
+```
+
 ## Ruby Versions
 
 - Ruby 1.9.3
