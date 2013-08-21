@@ -1,8 +1,11 @@
 # -*- encoding: utf-8 -*-
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'craigslist/version'
 
 Gem::Specification.new do |s|
   s.name = 'craigslist'
-  s.version = '0.0.4'
+  s.version = Craigslist::Version
   s.platform = Gem::Platform::RUBY
   s.required_ruby_version = ">= 1.9.3"
   s.license = 'MIT'
@@ -20,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'nokogiri', '~> 1.6.0'
 
-  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rake', '~> 10.1.0'
   s.add_development_dependency 'rspec', '~> 2.14.1'
   s.add_development_dependency 'nokogiri', '~> 1.6.0'
 end

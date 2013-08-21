@@ -3,6 +3,7 @@ require 'open-uri'
 require_relative 'craigslist/persistable'
 require_relative 'craigslist/net'
 require_relative 'craigslist/categories'
+require_relative 'craigslist/version'
 
 module Craigslist
   INITIALIZING_METHODS = [
