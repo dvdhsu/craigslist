@@ -1,4 +1,9 @@
-# Craigslist Gem [![Build Status](https://secure.travis-ci.org/gregstallings/craigslist.png)](http://travis-ci.org/gregstallings/craigslist)
+# Craigslist Gem 
+[![Build Status](https://secure.travis-ci.org/gregstallings/craigslist.png?branch=master)][travis]
+[![Coverage Status](https://coveralls.io/repos/gregstallings/craigslist/badge.png?branch=master)][coveralls]
+
+[travis]: http://travis-ci.org/gregstallings/craigslist
+[coveralls]: https://coveralls.io/r/gregstallings/craigslist
 
 Unofficial Ruby interface for programmatically accessing Craigslist listings.
 
@@ -117,6 +122,11 @@ c.fetch
 => [{}, ...10]
 ```
 
+## Ruby Versions
+
+- Ruby 1.9.3
+- Ruby 2.0.0
+
 ## Contributing
 
 Contributions are welcome and appreciated.
@@ -127,23 +137,4 @@ This software is not associated with Craigslist and is intended for research pur
 
 ## License
 
-Copyright (c) 2013 Greg Stallings
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Copyright (c) 2013 Greg Stallings. See [LICENSE](https://github.com/gregstallings/craigslist/blob/master/LICENSE) for details.
