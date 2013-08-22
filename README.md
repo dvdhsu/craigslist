@@ -7,6 +7,14 @@
 
 Unofficial Ruby interface for programmatically accessing Craigslist listings.
 
+## Quickstart
+
+```ruby
+require 'craigslist'
+
+Craigslist.seattle.bikes.fetch
+```
+
 ## Usage
 
 ### Instantiation
@@ -17,30 +25,30 @@ require 'craigslist'
 # A direct call to a city or category method will return an instance of the
 # internal persistable object
 Craigslist.city(:seattle)
-=> <Craigslist::Persistable:0x0000 @city=:seattle>
+=> <Craigslist::Persistable @city=:seattle>
 
 # Additional setter methods can be chained to the persistable
 
 # Setting a category such as :bikes will set the category_path which is mapped
 # internally
 Craigslist.city(:seattle).category(:bikes)
-=> <Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
+=> <Craigslist::Persistable @city=:seattle, @category_path="bia">
 
 # Internal search criteria may be more conveniently set using dynamic methods
 # for city and category
 Craigslist.seattle.bikes
-=> <Craigslist::Persistable:0x0000 @city=:seattle, @category_path="bia">
+=> <Craigslist::Persistable @city=:seattle, @category_path="bia">
 
 # Any subsequent chained methods will override any previously set attributes
 c = Craiglist.seattle.bikes.limit(20).max_ask(200)
-=> <Craigslist::Persistable:0x0000
+=> <Craigslist::Persistable
  @city=:seattle,
  @category_path="bia",
  @limit=20,
  @max_ask=200>
 
 c.sfbay.limit(10).max_ask(100)
-=> <Craigslist::Persistable:0x0000
+=> <Craigslist::Persistable
  @city=:sfbay,
  @category_path="bia",
  @limit=10,
@@ -58,7 +66,7 @@ Craigslist do
   min_ask 100
   max_ask 200
 end
-=> <Craigslist::Persistable:0x0000
+=> <Craigslist::Persistable
  @city=:seattle,
  @category_path="bia",
  @limit=10,
@@ -89,7 +97,7 @@ Craigslist.valid_category?(:bikes)
 # If the desired category is not mapped within the gem, the category_path can
 # be set manually
 Craigslist.seattle.category_path('bia')
-=> <Craigslist::Persistable:0x0000 @city=:seattle, category_path="bia">
+=> <Craigslist::Persistable @city=:seattle, category_path="bia">
 ```
 
 ### Fetching results
@@ -142,12 +150,16 @@ Or install it yourself as:
 $ gem install craiglist
 ```
 
+## Documentation
+
+[http://rdoc.info/gems/craigslist](http://rdoc.info/gems/craigslist)
+
 ## Support
 
 - Ruby 1.9.3
 - Ruby 2.0.0
 
-Due to unpredictable changes in site layout, you may need to modify the `#fetch` method.
+Due to unpredictable changes in site layout, you may need to modify the `#fetch` method. In future versions, this logic should be extracted into configurable options.
 
 ## Contributing
 

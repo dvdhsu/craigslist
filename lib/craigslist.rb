@@ -1,8 +1,9 @@
-require 'craigslist/categories'
-require 'craigslist/helpers'
-require 'craigslist/net'
-require 'craigslist/persistable'
-require 'craigslist/version'
+require_relative 'craigslist/categories'
+require_relative 'craigslist/errors'
+require_relative 'craigslist/helpers'
+require_relative 'craigslist/net'
+require_relative 'craigslist/persistable'
+require_relative 'craigslist/version'
 require 'open-uri'
 
 module Craigslist
@@ -27,7 +28,9 @@ module Craigslist
       end
     end
 
-    # Handles dynamic finder methods for valid cities and categories
+    # Provides dynamic finder methods for valid cities and categories
+    #
+    # @return [Craigslist::Persistable, NoMethodError]
     def method_missing(name, *args, &block)
       if found_category = category_path_by_name(name)
         Persistable.new(category_path: found_category)

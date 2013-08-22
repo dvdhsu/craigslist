@@ -2,6 +2,8 @@ module Craigslist
   module Helpers
 
     # Returns an array of all stored categories
+    #
+    # @return [Array<Craigslist::Categories>]
     def categories
       categories = CATEGORIES.keys
 
@@ -13,17 +15,23 @@ module Craigslist
     end
 
     # Returns true if the given city path is valid
+    #
+    # @param city_path [String]
+    # @return [Boolean]
     def valid_city?(city_path)
       begin
         uri = Craigslist::Net::build_city_uri(city_path)
         uri = URI.parse(uri)
         uri.open.status[0] == '200'
-      rescue => e
+      rescue => error
         false
       end
     end
 
     # Returns true if the given category name is valid
+    #
+    # @param category [Symbol, String]
+    # @return [Boolean]
     def valid_category_name?(category)
       category = category.to_sym
 
@@ -39,6 +47,9 @@ module Craigslist
     end
 
     # Returns true if the given category path is valid
+    #
+    # @param category_path [String]
+    # @return [Boolean]
     def valid_category_path?(category_path)
       CATEGORIES.each do |k, v|
         if v[:path] && v[:path] == category_path
@@ -54,6 +65,9 @@ module Craigslist
     end
 
     # Returns the category path given the category name, returns false otherwise
+    #
+    # @param category [Symbol, String]
+    # @return [String, false]
     def category_path_by_name(category)
       category = category.to_sym
 

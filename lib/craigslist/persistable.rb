@@ -2,6 +2,7 @@ require 'nokogiri'
 
 module Craigslist
   class Persistable
+
     DEFAULTS = {
       limit: 100,
       query: nil,
@@ -24,8 +25,13 @@ module Craigslist
       end
     end
 
+    # Fetches results with Nokogiri using initialized attributes from the
+    # Persistable
+    #
+    # @param max_results [Integer]
+    # @return [Array]
     def fetch(max_results=@limit)
-      raise StandardError, 'city and category must be set before fetching results' if
+      raise InsufficientQueryAttributesError.new if
         @city.nil? || @category_path.nil?
 
       options = {
@@ -76,17 +82,20 @@ module Craigslist
       results
     end
 
+    ##
     # Simple reader methods
+    ##
 
     attr_reader :results
 
-    # Simple writer methods
-
+    # @param city [Symbol]
+    # @return [Craigslist::Persistable]
     def city=(city)
       @city = city
       self
     end
 
+    # @param category [Symbol, String]
     def category=(category)
       category_path = Craigslist::category_path_by_name(category)
       if category_path
@@ -96,11 +105,15 @@ module Craigslist
       end
     end
 
+    # @param category_path [String]
+    # @return [Craigslist::Persistable]
     def category_path=(category_path)
       @category_path = category_path
       self
     end
 
+    # @param limit [Integer]
+    # @return [Craigslist::Persistable]
     def limit=(limit)
       raise ArgumentError, 'limit must be greater than 0' unless
         limit != nil && limit > 0
@@ -108,6 +121,8 @@ module Craigslist
       self
     end
 
+    # @param query [String]
+    # @return [Craigslist::Persistable]
     def query=(query)
       raise ArgumentError, 'query must be a string' unless
         query.nil? || query.is_a?(String)
@@ -115,6 +130,8 @@ module Craigslist
       self
     end
 
+    # @param search_type [Boolean]
+    # @return [Craigslist::Persistable]
     def search_type=(search_type)
       raise ArgumentError, 'search_type must be one of :A, :T' unless
         search_type == :A || search_type == :T
@@ -122,6 +139,8 @@ module Craigslist
       self
     end
 
+    # @param has_image [Integer]
+    # @return [Craigslist::Persistable]
     def has_image=(has_image)
       raise ArgumentError, 'has_image must be a boolean' unless
         has_image.is_a?(TrueClass) || has_image.is_a?(FalseClass)
@@ -131,6 +150,8 @@ module Craigslist
       self
     end
 
+    # @param min_ask [Integer]
+    # @return [Craigslist::Persistable]
     def min_ask=(min_ask)
       raise ArgumentError, 'min_ask must be at least 0' unless
         min_ask.nil? || min_ask >= 0
@@ -138,6 +159,8 @@ module Craigslist
       self
     end
 
+    # @param max_ask [Integer]
+    # @return [Craigslist::Persistable]
     def max_ask=(max_ask)
       raise ArgumentError, 'max_ask must be at least 0' unless
         max_ask.nil? || max_ask >= 0
@@ -145,17 +168,23 @@ module Craigslist
       self
     end
 
+    ##
     # Methods compatible with writing from block with instance_eval also serve
-    # as simple reader methods. Object serves as the toggle between reader and
+    # as simple reader methods. `Object` serves as the toggle between reader and
     # writer methods and thus is the only object which cannot be set explicitly.
     # Category is the outlier here because it's not accessible for reading
     # since it does not persist as an instance variable.
+    ##
 
+    # @param category [Symbol]
+    # @return [Craigslist::Persistable]
     def category(category)
       self.category = category
       self
     end
 
+    # @param city [Symbol]
+    # @return [Craigslist::Persistable, Symbol]
     def city(city=Object)
       if city == Object
         @city
@@ -165,6 +194,8 @@ module Craigslist
       end
     end
 
+    # @param category_path [String]
+    # @return [Craigslist::Persistable, String]
     def category_path(category_path=Object)
       if category_path == Object
         @category_path
@@ -174,6 +205,8 @@ module Craigslist
       end
     end
 
+    # @param limit [Integer]
+    # @return [Craigslist::Persistable, Integer]
     def limit(limit=Object)
       if limit == Object
         @limit
@@ -183,6 +216,8 @@ module Craigslist
       end
     end
 
+    # @param query [String]
+    # @return [Craigslist::Persistable, String]
     def query(query=Object)
       if query == Object
         @query
@@ -192,6 +227,8 @@ module Craigslist
       end
     end
 
+    # @param search_type [Symbol]
+    # @return [Craigslist::Persistable, Symbol]
     def search_type(search_type=Object)
       if search_type == Object
         @search_type
@@ -201,6 +238,8 @@ module Craigslist
       end
     end
 
+    # @param has_image [Integer]
+    # @return [Craigslist::Persistable, Integer]
     def has_image(has_image=Object)
       if has_image == Object
         @has_image
@@ -210,6 +249,8 @@ module Craigslist
       end
     end
 
+    # @param min_ask [Integer]
+    # @return [Craigslist::Persistable, Integer]
     def min_ask(min_ask=Object)
       if min_ask == Object
         @min_ask
@@ -219,6 +260,8 @@ module Craigslist
       end
     end
 
+    # @param max_ask [Integer]
+    # @return [Craigslist::Persistable, Integer]
     def max_ask(max_ask=Object)
       if max_ask == Object
         @max_ask
@@ -228,15 +271,21 @@ module Craigslist
       end
     end
 
+    ##
     # Misc
+    ##
 
+    # Clears the Persistable and returns the persistable for continued chaining
+    #
+    # @return [Craigslist::Persistable]
     def clear
-      @city = nil
-      @category_path = nil
       reset_defaults
       self
     end
 
+    # Provides dynamic finder methods for valid cities and categories
+    #
+    # @return [Craigslist::Persistable, NoMethodError]
     def method_missing(name, *args, &block)
       if found_category = Craigslist::category_path_by_name(name)
         self.category_path = found_category
@@ -251,6 +300,7 @@ module Craigslist
 
     private
 
+    # Sets uninitialized defaults as instance variables of the Persistable
     def set_uninitialized_defaults_as_instance_variables
       DEFAULTS.each do |k, v|
         var_name = "@#{k}".to_sym
@@ -260,7 +310,11 @@ module Craigslist
       end
     end
 
+    # Resets all instance variables of the Persistable
     def reset_defaults
+      @city = nil
+      @category_path = nil
+
       DEFAULTS.each do |k, v|
         var_name = "@#{k}".to_sym
         self.instance_variable_set(var_name, v)

@@ -1,5 +1,6 @@
 module Craigslist
   module Net
+
     OPTIONS_PARAMS_MAP = {
       query: :query,
       search_type: :searchType,
@@ -11,12 +12,21 @@ module Craigslist
     class << self
 
       # Returns a Craigslist uri given the city subdomain
+      #
+      # @param city_path [String]
+      # @return [String]
       def build_city_uri(city_path)
         "http://#{city_path}.craigslist.org"
       end
 
       # Returns a Craigslist uri given city path, category path, options
       # including search, and offset
+      #
+      # @param city_path [String]
+      # @param category_path [String]
+      # @param options [Hash]
+      # @param offset [Integer]
+      # @return [String]
       def build_uri(city_path, category_path, options, offset=nil)
 
         # Vary url if any of the search options are not set
@@ -56,6 +66,8 @@ module Craigslist
 
       private
 
+      # @param params [Hash]
+      # @return [String]
       def build_query(params)
         params.map { |k, v|
           if v.class == Array
@@ -66,6 +78,8 @@ module Craigslist
         }.join('&')
       end
 
+      # @param s [String]
+      # @return [String]
       def escape(s)
         URI.encode_www_form_component(s)
       end

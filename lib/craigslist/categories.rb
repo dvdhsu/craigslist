@@ -1,4 +1,5 @@
 module Craigslist
+
   CATEGORIES = {
     community: {
       path: 'ccc',
@@ -166,4 +167,5 @@ module Craigslist
       path: 'res'
     }
   }
+
 end
