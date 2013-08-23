@@ -5,7 +5,7 @@
 [travis]: http://travis-ci.org/gregstallings/craigslist
 [coveralls]: https://coveralls.io/r/gregstallings/craigslist
 
-Unofficial Ruby interface for programmatically accessing Craigslist listings.
+Unofficial Ruby DSL for programmatically accessing Craigslist listings.
 
 ## Quickstart
 
