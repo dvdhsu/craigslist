@@ -7,14 +7,6 @@
 
 Unofficial Ruby DSL for programmatically accessing Craigslist listings.
 
-## Quickstart
-
-```ruby
-require 'craigslist'
-
-Craigslist.seattle.bikes.fetch
-```
-
 ## Usage
 
 ### Instantiation
@@ -158,8 +150,6 @@ $ gem install craiglist
 
 - Ruby 1.9.3
 - Ruby 2.0.0
-
-Due to unpredictable changes in site layout, you may need to modify the `#fetch` method. In future versions, this logic should be extracted into configurable options.
 
 ## Contributing
 
