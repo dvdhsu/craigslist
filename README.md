@@ -132,13 +132,13 @@ gem 'craigslist'
 
 Then execute:
 
-```shell
+```bash
 $ bundle
 ```
 
 Or install it yourself as:
 
-```shell
+```bash
 $ gem install craiglist
 ```
 
