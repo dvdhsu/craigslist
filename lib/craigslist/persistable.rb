@@ -275,7 +275,7 @@ module Craigslist
     # Misc
     ##
 
-    # Clears the Persistable and returns the persistable for continued chaining
+    # Clears the Persistable and returns it for continued chaining
     #
     # @return [Craigslist::Persistable]
     def clear
