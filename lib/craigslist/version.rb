@@ -2,7 +2,7 @@ module Craigslist
   class Version
     MAJOR = 0 unless defined? Craigslist::Version::MAJOR
     MINOR = 1 unless defined? Craigslist::Version::MINOR
-    PATCH = 0 unless defined? Craigslist::Version::PATCH
+    PATCH = 1 unless defined? Craigslist::Version::PATCH
     PRE = nil unless defined? Craigslist::Version::PRE
 
     class << self

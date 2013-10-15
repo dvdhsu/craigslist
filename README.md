@@ -146,10 +146,6 @@ $ gem install craiglist
 - Ruby 1.9.3
 - Ruby 2.0.0
 
-## Contributing
-
-Meaningful contributions will be accepted.
-
 ## Notice
 
 This software is not associated with Craigslist and is intended for research purposes only. Any use outside of this may be a violation of Craigslist terms of use.
