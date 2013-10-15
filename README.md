@@ -1,11 +1,6 @@
 # Craigslist Gem 
-[![Build Status](https://secure.travis-ci.org/gregstallings/craigslist.png?branch=master)][travis]
-[![Coverage Status](https://coveralls.io/repos/gregstallings/craigslist/badge.png?branch=master)][coveralls]
 
-[travis]: http://travis-ci.org/gregstallings/craigslist
-[coveralls]: https://coveralls.io/r/gregstallings/craigslist
-
-Unofficial Ruby DSL for programmatically accessing Craigslist listings.
+Unofficial Ruby interface for programmatically accessing Craigslist listings.
 
 ## Usage
 
