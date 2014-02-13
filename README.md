@@ -27,7 +27,7 @@ Craigslist.seattle.bikes
 => <Craigslist::Persistable @city=:seattle, @category_path="bia">
 
 # Any subsequent chained methods will override any previously set attributes
-c = Craiglist.seattle.bikes.limit(20).max_ask(200)
+c = Craigslist.seattle.bikes.limit(20).max_ask(200)
 => <Craigslist::Persistable
  @city=:seattle,
  @category_path="bia",
