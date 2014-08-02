@@ -56,13 +56,13 @@ module Craigslist
           result['text'] = title.text.strip
           result['href'] = title['href']
 
-          info = node.at_css('.l2 .pnr')
-
-          if price = info.at_css('.price')
+          if price = node.at_css('.l1 .price')
             result['price'] = price.text.strip
           else
             result['price'] = nil
           end
+
+          info = node.at_css('.l2 .pnr')
 
           if location = info.at_css('small')
             # Remove brackets
