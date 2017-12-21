@@ -49,30 +49,27 @@ module Craigslist
         uri = Craigslist::Net::build_uri(@city, @category_path, options, i * 100) if i > 0
         doc = Nokogiri::HTML(open(uri))
 
-        doc.css('p.row').each do |node|
+        doc.css('p.result-info').each do |node|
           result = {}
 
-          title = node.at_css('.pl a')
+          title = node.at_css('a.result-title')
           result['text'] = title.text.strip
           result['href'] = title['href']
 
-          if price = node.at_css('.l2 .price')
+          if price = node.at_css('.result-price')
             result['price'] = price.text.strip
           else
             result['price'] = nil
           end
 
-          info = node.at_css('.l2 .pnr')
-
-          if location = info.at_css('small')
+          if location = node.at_css('.result-hood')
             # Remove brackets
             result['location'] = location.text.strip[1..-2].strip
           else
             result['location'] = nil
           end
 
-          attributes = info.at_css('.px').text
-          result['has_img'] = attributes.include?('img') || attributes.include?('pic')
+          result['has_img'] = node.at_css('.result-tags').text.include? 'pic'
 
           results << result
           break if results.length == max_results
