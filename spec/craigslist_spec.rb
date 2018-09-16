@@ -269,8 +269,8 @@ describe 'Craigslist' do
       describe 'a request to fetch 1 result' do
         it 'should return an Array with length of 1' do
           res = Craigslist.city(:seattle).category(:bikes).fetch(1)
-          res.should be_instance_of Array
-          res.length.should == 1
+          expect(res).to be_instance_of(Array)
+          expect(res.length).to eq(1)
         end
       end
 
